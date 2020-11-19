@@ -1,7 +1,7 @@
 # vipmaster
 VIPMASTER (VIP Management service for Master-Slave DB Cluster) SETUP 
 
-Supported Linux Version : Centos/RHEL 7
+Supported Linux Version : Centos/RHEL 7 and 8
 
 Download vipmaster.py and vipmaster.service
 root # mkdir /opt/vipmaster/
