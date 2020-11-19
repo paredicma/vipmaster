@@ -1,11 +1,11 @@
 #-*- coding: utf-8 -*-
 ## Author               : Mustafa YAVUZ 
 ## E-mail               : msyavuz@gmail.com
-## Version              : 0.1
-## Date                 : 16.03.20120
+## Version              : 1.0
+## Date                 : 21.10.20120
 ## OS System            : Redhat/Centos 7
-## DB Systems           : Postgresql, MySQL, Mongodb, Oracle
-## System Requirement   : python
+## DB Systems           : Postgresql, ( MySQL, Mongodb maybe in future )
+## System Requirement   : python,mailx
 from time import *
 import os
 import sys
@@ -18,14 +18,17 @@ RUN_FILE="/var/run/vipmaster.pid"
 SLEEP_TIME=15
 NETWORK_INT='team0'
 NETWORK_NUMBER='0'
-VIRTUAL_IP='10.10.10.11'
+CLUSTER_NAME='CLUSTER_PG'
+VIRTUAL_IP='10.10.10.10'
 LOCALE_IP='localhost'
 DB_TYPE='Postgresql'
 DB_NAME='postgres'
-DB_USER='vipservice'  ## Read only permission user.
-DB_PASSWORD='********'
+DB_USER='vipservice'  ## superuser.
+PASSWORDLESS_CONN=True
+DB_PASSWORD='NoNeedBecauseOf_PWDLESSCONN'
 DB_PORT='5432'
-BIN_DIR='/usr/pgsql-11/bin/'
+BIN_DIR='/usr/pgsql-12/bin/'
+mailTO = 'TEAM-OPENDBA@turkcell.entp.tgc'
 ############################## GENERAL FUNCTION ###########################
 def get_datetime():
 	my_year=str(localtime()[0])
@@ -87,22 +90,24 @@ def logWrite(logFile,logText):
 		print (logText)
 		logText=get_datetime()+' ::: '+logText
 		fileAppendWrite(logFile,logText)
-
 ############################## AUX FUNCTIONS ##################
 def db_is_master():
 	if( DB_TYPE=='Postgresql' ):
-		getStatus,getResponse = commands.getstatusoutput("export PGPASSWORD="+DB_PASSWORD+" ; "+ BIN_DIR+"psql -t -h "+LOCALE_IP+" -d "+DB_NAME+" -U "+DB_USER+" -p "+DB_PORT+" -c 'select pg_is_in_recovery()'")
-#		print "status : "+ str (getStatus)
-#		print "status : "+ str (getResponse)
-		if ( getStatus==0 and getResponse.find('f')>-1 ):
-			return True
+		if(PASSWORDLESS_CONN):
+			getStatus,getResponse = commands.getstatusoutput(BIN_DIR+"psql -t -h "+LOCALE_IP+" -d "+DB_NAME+" -U "+DB_USER+" -p "+DB_PORT+" -c 'select pg_is_in_recovery()'")
+			if ( getStatus==0 and getResponse.find('f')>-1 ):
+				return True
+			else:
+				return False
 		else:
-			return False
+			getStatus,getResponse = commands.getstatusoutput("export PGPASSWORD="+DB_PASSWORD+" ; "+ BIN_DIR+"psql -t -h "+LOCALE_IP+" -d "+DB_NAME+" -U "+DB_USER+" -p "+DB_PORT+" -c 'select pg_is_in_recovery()'")
+			if ( getStatus==0 and getResponse.find('f')>-1 ):
+				return True
+			else:
+				return False			
 	elif( DB_TYPE=='Mysql' ):
 		return False
 	elif( DB_TYPE=='Mongodb' ):
-		return False
-	elif( DB_TYPE=='Oracle' ):
 		return False
 	else:
 		return False
@@ -141,10 +146,13 @@ def service_control(param): ##
 						if ( db_is_master() ) :
 							UP_virtual_ip()
 							ANNOUNCE_virtual_ip_isMine()
+							if( SILENT_MODE==False ):
+								os.system('nohup echo "'+CLUSTER_NAME+' New Primary DB -> '+str(os.uname()[1])+'" | mailx -s "'+CLUSTER_NAME+' Virtaul IP Owner Changed." '+mailTO+' &')
 					else:
 						UP_virtual_ip()
 						ANNOUNCE_virtual_ip_isMine()
-					
+						if( SILENT_MODE==False ):
+							os.system('nohup echo "'+CLUSTER_NAME+' New Primary DB -> '+str(os.uname()[1])+'" | mailx -s "'+CLUSTER_NAME+' Virtaul IP Owner Changed." '+mailTO+' &')					
 			else:
 				if ( HAS_virtual_ip() == 0 ):   ##I Have virtual IP
 					DOWN_virtual_ip()
