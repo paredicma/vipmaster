@@ -5,6 +5,8 @@ Supported Linux Version : Centos/RHEL 7 and 8
 
 Download vipmaster.py and vipmaster.service
 
+FOR ALL CLUSTER SERVERS
+
 root # mkdir /opt/vipmaster/
 
 root # cp vipmaster.py /opt/vipmaster/
