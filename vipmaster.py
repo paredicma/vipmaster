@@ -19,12 +19,12 @@ RUN_FILE="/var/run/vipmaster.pid"
 SLEEP_TIME=15
 NETWORK_INT='ens18'
 NETWORK_NUMBER='0'
-CLUSTER_NAME='zabbix_pg'
-VIRTUAL_IP='10.40.2.30'
+CLUSTER_NAME='pgdb'
+VIRTUAL_IP='10.10.10.11'
 DB_TYPE='Postgresql'
 BIN_DIR='/usr/pgsql-12/bin/'
 DATA_DIR='/data/pgdata/12/'
-mailTO = 'yavuz@textkernel.nl'
+mailTO = 'msyavuz@gmail.com'
 ############################## GENERAL FUNCTION ###########################
 def fileAppendWrite(file, writeText):
 	try :
