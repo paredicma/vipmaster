@@ -2,6 +2,7 @@
 VIPMASTER (VIP Management service for Master-Slave DB Cluster) SETUP 
 
 Supported Linux Version : Centos/RHEL 7 and 8
+Python version: 3
 
 Download vipmaster.py and vipmaster.service
 
@@ -16,14 +17,7 @@ root # cp vipmaster.service /usr/lib/systemd/system/
 root # systemctl daemon-reload
 
 
-for postgresql
-
-psql #  create user vipservice encrypted password 'secretpass';
-
-psql #  grant pg_monitor to vipservice ;
-
-
-configure vipmaster.py
+configure vipmaster.py according to your network interface and VIP address
 
 root # vi /opt/vipmaster/vipmaster.py
 
