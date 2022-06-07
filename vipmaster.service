@@ -1,4 +1,5 @@
-# Virtual IP manage Service 
+################################
+# Virtual IP manage Service
 [Unit]
 Description= Virtual IP Manager service for master-slave db clusters
 After=syslog.target
@@ -12,8 +13,8 @@ Environment=VIPMASTER_FILE=/opt/vipmaster/vipmaster.py
 ## Disable OOM kill on the postmaster
 OOMScoreAdjust=-1000
 
-ExecStart=/usr/bin/python ${VIPMASTER_FILE} start
-ExecStop=/usr/bin/python ${VIPMASTER_FILE} stop
+ExecStart=/usr/bin/python3 ${VIPMASTER_FILE} start
+ExecStop=/usr/bin/python3 ${VIPMASTER_FILE} stop
 
 ## Give a reasonable amount of time for the server to start up/shut down
 TimeoutSec=30
